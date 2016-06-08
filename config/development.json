@@ -1,0 +1,18 @@
+{
+  "mongo_url":"mongodb://localhost:27017/my_db",
+	"mongo_coll_users" : "users",
+  
+
+  "redis" :	{
+    "MA" : {
+      "host"    :    "127.0.0.1",
+      "port"    :    6379
+    },
+    "SL" : {
+      "host"    :    "127.0.0.1",
+      "port"    :    6379
+    }
+  },
+
+  "express_port": 3000
+}

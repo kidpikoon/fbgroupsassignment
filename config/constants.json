@@ -1,0 +1,12 @@
+{
+  "LOG_IN_EXPIRY" : 86400,
+
+  "redisPath" : {
+    "imageByThread"       :   "ImageSet.",
+    "blacklistWords"      :   "Blacklist.Words",
+    "recentlyViewed"      :   "Poll.Recent.",
+    "flushHandlerActive"  :   "FlushHandler.",
+    "apiStatus"           :   "API.Status."
+  }
+
+}
