@@ -24,6 +24,8 @@ var ERROR_CODES  =   new Array();
 /* ALL            */ ERROR_CODES[13]   =  'Invalid userId';
 /* ALL            */ ERROR_CODES[14]   =  'Invalid groupId';
 /* ALL            */ ERROR_CODES[15]   =  'user is not group admin';
+/* -/admin        */ ERROR_CODES[16]   =  'admin value must be boolean';
+/* -/admin        */ ERROR_CODES[17]   =  'Object was not modified, since it already had the required changes';
 
 
 

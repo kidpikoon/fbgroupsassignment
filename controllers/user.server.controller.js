@@ -44,8 +44,11 @@ exports.logIn = function (req, res, next) {
         return;
       }
       else{
-        req.user = JSON.parse(user);
-        next();
+        user = JSON.parse(user);
+        userCollection.findOne({_id : ObjectId(user._id)}, function(err, doc){
+          req.user = doc;
+          next();
+        });
       }
     });
   }

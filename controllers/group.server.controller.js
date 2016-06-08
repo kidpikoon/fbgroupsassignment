@@ -10,9 +10,7 @@ exports.addGroup = function (req, res) {
   var data = req.body;
 
   // Compulsory
-  var userId = (typeof(data.userId) !== "undefined")
-    ? data.userId.trim().toLowerCase()
-    : "";
+  var userId = req.user._id;
   var name = (typeof(data.name) !== "undefined")
     ? data.name.trim()
     : "";
@@ -131,17 +129,122 @@ exports.isGroupAdmin = function (req, res, next) {
       });
 
   var groupId = req.group._id;
-
-  if(!CommonFunctions.isMongoId(groupId)){
-    ErrorCodeHandler.getErrorJSONData({'code':14, 'res':res});
-    return;
+  var isAdmin = false;
+  if(req.user.admin){
+    isAdmin = req.user.admin.some(function (id) {
+      return id.equals(groupId);
+    });
   }
-
-  if(!user.admin || user.admin.indexOf(groupId) == -1){
+  
+  if(!isAdmin){
     ErrorCodeHandler.getErrorJSONData({'code':15, 'res':res});
     return;
   }
   else{
     next();
   }
+};
+
+
+exports.addAdmin = function (req, res) {
+  res.set({
+          'Content-Type'  :   'application/json'
+      });
+  var data = req.body;
+
+  // Compulsory
+  var groupId = req.group._id;
+  var userId = (typeof(data.userId) !== "undefined")
+    ? data.userId.trim().toLowerCase()
+    : "";
+  var admin = (typeof(data.admin) !== "undefined")
+    ? data.admin.trim()
+    : "";
+  // other details here
+
+  if( 
+      CommonFunctions.isNull(userId)  ||
+      CommonFunctions.isNull(admin)
+    ){
+    ErrorCodeHandler.getErrorJSONData({'code':1, 'res':res});
+    return;
+  }
+
+  if(!CommonFunctions.isMongoId(userId)){
+    ErrorCodeHandler.getErrorJSONData({'code':13, 'res':res});
+    return;
+  }
+
+  if(admin != 'true' && admin != 'false'){
+    ErrorCodeHandler.getErrorJSONData({'code':16, 'res':res});
+    return;
+  }
+
+  if(admin == 'true' || admin == true){
+    admin = true;
+  }
+  else{
+    admin = false;
+  }
+
+  var succResp = {
+    data : "",
+    error : {
+      code: 0,
+      text : "Group Admin set successfully"
+    }
+  };
+
+  userCollection.findOne({_id : ObjectId(userId)}, function(err, doc){
+    if(err){
+      ErrorCodeHandler.getErrorJSONData({'code':2, 'res':res});
+      return;
+    }
+    else if(!doc){
+      ErrorCodeHandler.getErrorJSONData({'code':13, 'res':res});
+      return;
+    }
+    else{
+      var isAdmin = false;
+      if(doc.admin){
+        isAdmin = doc.admin.some(function (id) {
+          return id.equals(groupId);
+        });
+      }
+
+      var updateQuery;
+      if(admin && !isAdmin){
+        updateQuery = {
+          $push : {
+            admin : ObjectId(groupId)
+          }
+        };
+      }
+      else if(!admin && isAdmin){
+        updateQuery = {
+          $pull : {
+            admin : ObjectId(groupId)
+          }
+        };
+      }
+      else{
+        ErrorCodeHandler.getErrorJSONData({'code':17, 'res':res});
+        return;
+      }
+
+      userCollection.update({_id : ObjectId(userId) }, updateQuery, function(err, reply){
+        if(err || reply.result.nModified < 1){
+          ErrorCodeHandler.getErrorJSONData({'code':2, 'res':res});
+          return;
+        }
+        else{
+          succResp.data = {
+            groupId : groupId,
+            userId : userId
+          };
+          res.status(200).send(succResp);
+        }
+      });
+    }
+  });
 };
