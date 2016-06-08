@@ -1,6 +1,5 @@
-// @chat.server.controller
+// @user.server.controller
 // Author: Rijul Luman
-// To authenticate the user and get online status
 
 'use strict';
 
@@ -69,6 +68,9 @@ exports.signup = function (req, res, next) {
   var verifyPassword = (typeof(data.verifyPassword) !== "undefined")
     ? data.verifyPassword.trim()
     : "";
+  var admin = (typeof(data.admin) !== "undefined")
+    ? data.admin.trim()
+    : false;
 
   if( 
       CommonFunctions.isNull(username)  ||
@@ -107,6 +109,9 @@ exports.signup = function (req, res, next) {
         password : password,
         created : new Date()
       };
+      if(admin == true || admin == 'true'){
+        userObj.admin = true;
+      }
       userCollection.insert(userObj, function(err, reply){
         if(err || !reply || reply.result.ok < 1){
           ErrorCodeHandler.getErrorJSONData({'code':2, 'res':res});
@@ -192,4 +197,72 @@ exports.sendDetails = function (req, res) {
 
   res.status(200).send(succResp);
   
+};
+
+exports.setAdmin = function (req, res) {
+  res.set({
+          'Content-Type'  :   'application/json'
+      });
+  var data = req.body;
+
+  // Compulsory
+  var username = (typeof(data.username) !== "undefined")
+    ? data.username.trim().toLowerCase()
+    : "";
+  var admin = (typeof(data.admin) !== "undefined")
+    ? data.admin.trim()
+    : false;
+  var groupId = (typeof(req.params.groupId) !== "undefined")
+    ? req.params.groupId.trim().toLowerCase()
+    : "";
+
+  if( 
+      CommonFunctions.isNull(username)  ||
+      CommonFunctions.isNull(admin)     ||
+      CommonFunctions.isNull(groupId)
+    ){
+    ErrorCodeHandler.getErrorJSONData({'code':1, 'res':res});
+    return;
+  }
+
+  var succResp = {
+    data : "",
+    error : {
+      code: 0,
+      text : "Admin Status Changed successfully"
+    }
+  };
+
+  userCollection.findOne({username : username}, function(err, doc){
+    if(err){
+      ErrorCodeHandler.getErrorJSONData({'code':2, 'res':res});
+      return;
+    }
+    else if(doc){
+      ErrorCodeHandler.getErrorJSONData({'code':5, 'res':res});
+      return;
+    }
+    else{
+      var userObj = {
+        username : username,
+        password : password,
+        created : new Date()
+      };
+      if(admin == true || admin == 'true'){
+        userObj.admin = true;
+      }
+      userCollection.insert(userObj, function(err, reply){
+        if(err || !reply || reply.result.ok < 1){
+          ErrorCodeHandler.getErrorJSONData({'code':2, 'res':res});
+          return;
+        }
+        else{
+          succResp.data = {
+            userId : reply.ops[0]._id
+          };
+          res.status(200).send(succResp);
+        }
+      });
+    }
+  });
 };

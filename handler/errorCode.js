@@ -19,6 +19,8 @@ var ERROR_CODES  =   new Array();
 
 /* Pending        */ ERROR_CODES[9]    =  '';
 /* ALL            */ ERROR_CODES[10]   =  notSignIn;
+/* -/admin        */ ERROR_CODES[11]   =  'Username doesnot exist';
+/* -/feed         */ ERROR_CODES[12]   =  'Invalid timestamp';
 
 
 

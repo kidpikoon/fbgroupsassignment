@@ -1,6 +1,11 @@
 {
   "mongo_url":"mongodb://userName:password@domain.com:27017,subdomain.domain.com:27017?authSource=admin",
   "mongo_coll_users" : "users",
+  "mongo_coll_events" : "events",
+  "mongo_coll_feeds"  : "feeds",
+  "mongo_coll_docs"   : "docs",
+  "mongo_coll_albums" : "albums",
+  "mongo_coll_groups" : "groups",
 
   "redis" : {
     "MA" : {

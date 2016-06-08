@@ -42,7 +42,12 @@ else {
   const PORT            =   config.express_port;
   // mongo config
   const MONGO_URL               = config.mongo_url;
-  const MONGO_COLL_USERS       = config.mongo_coll_users;
+  const MONGO_COLL_USERS        = config.mongo_coll_users;
+  const MONGO_COLL_FEEDS        = config.mongo_coll_feeds;
+  const MONGO_COLL_EVENTS       = config.mongo_coll_events;
+  const MONGO_COLL_DOCS         = config.mongo_coll_docs;
+  const MONGO_COLL_ALBUMS       = config.mongo_coll_albums;
+  const MONGO_COLL_GROUPS       = config.mongo_coll_groups;
 
   // redis config
   // var redisConfigParam    =   config;
@@ -116,8 +121,13 @@ else {
    */
   var MongoClient         =   require('mongodb').MongoClient;
   global.ObjectId         =   require('mongodb').ObjectID;
-  global.mongoConnection        =   null;
-  global.userCollection        =   null;
+  global.mongoConnection       = null;
+  global.userCollection        = null;
+  global.feedCollection        = null; 
+  global.eventCollection       = null; 
+  global.albumCollection       = null; 
+  global.docsCollection        = null; 
+  global.groupCollection       = null; 
 
   MongoClient.connect(MONGO_URL, function(err, db) {  
     // on error
@@ -134,6 +144,11 @@ else {
     
     // set collection
     userCollection         = mongoConnection.collection(MONGO_COLL_USERS);
+    feedCollection         = mongoConnection.collection(MONGO_COLL_FEEDS);
+    eventCollection        = mongoConnection.collection(MONGO_COLL_EVENTS);
+    albumCollection        = mongoConnection.collection(MONGO_COLL_ALBUMS);
+    docsCollection         = mongoConnection.collection(MONGO_COLL_DOCS);
+    groupCollection        = mongoConnection.collection(MONGO_COLL_GROUPS);
 
     // mongo db started
     console.log('Mongo DB Started');
