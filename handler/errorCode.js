@@ -21,6 +21,9 @@ var ERROR_CODES  =   new Array();
 /* ALL            */ ERROR_CODES[10]   =  notSignIn;
 /* -/admin        */ ERROR_CODES[11]   =  'Username doesnot exist';
 /* -/feed         */ ERROR_CODES[12]   =  'Invalid timestamp';
+/* ALL            */ ERROR_CODES[13]   =  'Invalid userId';
+/* ALL            */ ERROR_CODES[14]   =  'Invalid groupId';
+/* ALL            */ ERROR_CODES[14]   =  'user is not group admin';
 
 
 
