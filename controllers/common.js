@@ -998,6 +998,16 @@ var CommonFunctions = {
     req.write( strParams );
     req.end();
   },
+
+  isGroupAdmin : function(req){
+    var isAdmin = false;
+    if(req.user.admin){
+      isAdmin = req.user.admin.some(function (id) {
+        return id.equals(req.group._id);
+      });
+    }
+    return isAdmin;
+  },
 }
 
 // export

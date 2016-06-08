@@ -1,4 +1,4 @@
-// @feed.server.controller
+// @group.server.controller
 // Author: Rijul Luman
 
 'use strict';
@@ -129,12 +129,7 @@ exports.isGroupAdmin = function (req, res, next) {
       });
 
   var groupId = req.group._id;
-  var isAdmin = false;
-  if(req.user.admin){
-    isAdmin = req.user.admin.some(function (id) {
-      return id.equals(groupId);
-    });
-  }
+  var isAdmin = CommonFunctions.isGroupAdmin(req);
   
   if(!isAdmin){
     ErrorCodeHandler.getErrorJSONData({'code':15, 'res':res});
@@ -205,12 +200,7 @@ exports.addAdmin = function (req, res) {
       return;
     }
     else{
-      var isAdmin = false;
-      if(doc.admin){
-        isAdmin = doc.admin.some(function (id) {
-          return id.equals(groupId);
-        });
-      }
+      var isAdmin = CommonFunctions.isGroupAdmin(req);
 
       var updateQuery;
       if(admin && !isAdmin){

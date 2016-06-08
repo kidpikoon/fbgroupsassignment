@@ -174,6 +174,7 @@ else {
   require('./routes/user.server.routes')(app);
   require('./routes/feed.server.routes')(app);
   require('./routes/group.server.routes')(app);
+  require('./routes/album.server.routes')(app);
 
   //
   // For webiste
