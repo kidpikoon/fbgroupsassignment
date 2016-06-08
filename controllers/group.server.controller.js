@@ -67,8 +67,8 @@ exports.addGroup = function (req, res) {
               admin : ObjectId(groupId)
             }
           };
-          userCollection.update(userObj, function(err, reply){
-            if(reply.result.nModified < 1){
+          userCollection.update({_id : ObjectId(userId)}, updateQuery, function(err, reply){
+            if(err || reply.result.nModified < 1){
               ErrorCodeHandler.getErrorJSONData({'code':2, 'res':res});
               return;
             }
@@ -88,7 +88,7 @@ exports.addGroup = function (req, res) {
 /**
  * get group info middleware
  */
-exports.getGroup = function (req, res) {
+exports.getGroup = function (req, res, next) {
   res.set({
           'Content-Type'  :   'application/json'
       });
@@ -103,7 +103,7 @@ exports.getGroup = function (req, res) {
   }
 
 	var findQuery = {
-		groupId : ObjectId(groupId)
+		_id : ObjectId(groupId)
 	};
 
 	groupCollection.findOne(findQuery, function(err, doc){
@@ -125,7 +125,7 @@ exports.getGroup = function (req, res) {
 /**
  * Check if user is Group Admin middleware
  */
-exports.isGroupAdmin = function (req, res) {
+exports.isGroupAdmin = function (req, res, next) {
   res.set({
           'Content-Type'  :   'application/json'
       });
@@ -138,7 +138,7 @@ exports.isGroupAdmin = function (req, res) {
   }
 
   if(!user.admin || user.admin.indexOf(groupId) == -1){
-    ErrorCodeHandler.getErrorJSONData({'code':14, 'res':res});
+    ErrorCodeHandler.getErrorJSONData({'code':15, 'res':res});
     return;
   }
   else{

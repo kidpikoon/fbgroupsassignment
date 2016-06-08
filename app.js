@@ -172,6 +172,8 @@ else {
   // For APIs
 
   require('./routes/user.server.routes')(app);
+  require('./routes/feed.server.routes')(app);
+  require('./routes/group.server.routes')(app);
 
   //
   // For webiste

@@ -23,7 +23,7 @@ var ERROR_CODES  =   new Array();
 /* -/feed         */ ERROR_CODES[12]   =  'Invalid timestamp';
 /* ALL            */ ERROR_CODES[13]   =  'Invalid userId';
 /* ALL            */ ERROR_CODES[14]   =  'Invalid groupId';
-/* ALL            */ ERROR_CODES[14]   =  'user is not group admin';
+/* ALL            */ ERROR_CODES[15]   =  'user is not group admin';
 
 
 

@@ -1,4 +1,5 @@
 // @feed.server.controller
+// Assumption : Feeds can be added by any user
 // Author: Rijul Luman
 
 'use strict';
@@ -10,9 +11,7 @@ exports.addFeed = function (req, res) {
   var data = req.body;
 
   // Compulsory
-  var userId = (typeof(data.userId) !== "undefined")
-    ? data.userId.trim().toLowerCase()
-    : "";
+  var userId = req.user._id;
   var groupId = (typeof(req.params.groupId) !== "undefined")
     ? req.params.groupId.trim().toLowerCase()
     : "";
@@ -24,8 +23,8 @@ exports.addFeed = function (req, res) {
     : "";
 
   if( 
-      CommonFunctions.isNull(username)  ||
-      CommonFunctions.isNull(admin)     ||
+      CommonFunctions.isNull(userId)    ||
+      CommonFunctions.isNull(message)   ||
       CommonFunctions.isNull(link)     	||
       CommonFunctions.isNull(groupId)
     ){
@@ -41,35 +40,24 @@ exports.addFeed = function (req, res) {
     }
   };
 
-  userCollection.findOne({username : username}, function(err, doc){
-    if(err){
+  var feedObj = {
+    userId : ObjectId(userId),
+    groupId : ObjectId(groupId),
+    message : message,
+    link : link,
+    created : new Date()
+  };
+
+  feedCollection.insert(feedObj, function(err, reply){
+    if(err || !reply || reply.result.ok < 1){
       ErrorCodeHandler.getErrorJSONData({'code':2, 'res':res});
       return;
     }
-    else if(doc){
-      ErrorCodeHandler.getErrorJSONData({'code':5, 'res':res});
-      return;
-    }
     else{
-      var feedObj = {
-        userId : ObjectId(userId),
-        groupId : ObjectId(groupId),
-        message : message,
-        link : link,
-        created : new Date()
+      succResp.data = {
+        feedId : reply.ops[0]._id
       };
-      feedCollection.insert(userObj, function(err, reply){
-        if(err || !reply || reply.result.ok < 1){
-          ErrorCodeHandler.getErrorJSONData({'code':2, 'res':res});
-          return;
-        }
-        else{
-          succResp.data = {
-            feedId : reply.ops[0]._id
-          };
-          res.status(200).send(succResp);
-        }
-      });
+      res.status(200).send(succResp);
     }
   });
 };
@@ -78,6 +66,7 @@ exports.getFeeds = function (req, res) {
   res.set({
           'Content-Type'  :   'application/json'
       });
+  var data = req.body;
 
   var timestamp = (typeof(data.timestamp) !== "undefined")
     ? data.timestamp.trim().toLowerCase()
@@ -119,7 +108,7 @@ exports.getFeeds = function (req, res) {
     }
   };
 
-	feedCollection.find(findQuery).limit(limit).toArray(function(err, docs){
+	feedCollection.find(findQuery).limit(limit).sort({created : -1}).toArray(function(err, docs){
 		if(err){
       ErrorCodeHandler.getErrorJSONData({'code':2, 'res':res});
       return;
