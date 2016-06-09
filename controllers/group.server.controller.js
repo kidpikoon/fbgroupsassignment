@@ -1,4 +1,5 @@
 // @group.server.controller
+// Assumption : Groups can be created and viewed by any user, groups admins can be added only by a group admin
 // Author: Rijul Luman
 
 'use strict';
