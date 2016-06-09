@@ -46,4 +46,4 @@ var DocSchema = new Schema({
     }
 });
 
-mongoose.model('Doc', DocSchema);
+mongoose.model('Docs', DocSchema);

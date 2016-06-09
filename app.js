@@ -42,12 +42,12 @@ else {
   const PORT            =   config.express_port;
   // mongo config
   const MONGO_URL               = config.mongo_url;
-  const MONGO_COLL_USERS        = config.mongo_coll_users;
-  const MONGO_COLL_FEEDS        = config.mongo_coll_feeds;
-  const MONGO_COLL_EVENTS       = config.mongo_coll_events;
-  const MONGO_COLL_DOCS         = config.mongo_coll_docs;
-  const MONGO_COLL_ALBUMS       = config.mongo_coll_albums;
-  const MONGO_COLL_GROUPS       = config.mongo_coll_groups;
+  // const MONGO_COLL_USERS        = config.mongo_coll_users;
+  // const MONGO_COLL_FEEDS        = config.mongo_coll_feeds;
+  // const MONGO_COLL_EVENTS       = config.mongo_coll_events;
+  // const MONGO_COLL_DOCS         = config.mongo_coll_docs;
+  // const MONGO_COLL_ALBUMS       = config.mongo_coll_albums;
+  // const MONGO_COLL_GROUPS       = config.mongo_coll_groups;
 
   // redis config
   // var redisConfigParam    =   config;
@@ -137,10 +137,17 @@ else {
     mongoose = mongooseConn.createConnection( db, { auto_reconnect: true , safe : safe});
   };
 
+  // Require all mongoose models
+  var models_path = __dirname + '/models';
+  var fs = require('fs');
+  fs.readdirSync(models_path).forEach(function (file) {
+    if (~file.indexOf('.js')) require(models_path + '/' + file)
+  })
+
   // Bootstrap db connection
   var isConnectedBefore = false;
   
-  connect(db);
+  connect(MONGO_URL);
   mongoose.on('disconnected', function() {
     console.log('MongoDB disconnected!');
     if(!isConnectedBefore){
