@@ -44,16 +44,17 @@ exports.addDoc = function (req, res) {
     userId : ObjectId(userId),
     groupId : ObjectId(groupId),
     subject : subject,
+    message : message,
     icon : icon,
     created : new Date(),
     updated : new Date()
   };
 
-  var doc = new Doc(docObj);
+  var doc = new Docs(docObj);
 
   doc.save(function(err, reply){
     if(err || !reply){
-      ErrorCodeHandler.getErrorJSONData({'code':2, 'res':res});
+      ErrorCodeHandler.getErrorJSONData({'code':2, 'res':res, 'dbErr' : err});
       return;
     }
     else{
@@ -111,7 +112,7 @@ exports.getDocs = function (req, res) {
 
 	Docs.collection.find(findQuery).limit(limit).sort({updated : -1}).toArray(function(err, docs){
 		if(err){
-      ErrorCodeHandler.getErrorJSONData({'code':2, 'res':res});
+      ErrorCodeHandler.getErrorJSONData({'code':2, 'res':res, 'dbErr' : err});
       return;
     }
     else{

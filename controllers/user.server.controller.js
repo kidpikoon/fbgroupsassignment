@@ -96,7 +96,7 @@ exports.signup = function (req, res, next) {
 
   User.findOne({username : username}).exec(function(err, doc){
     if(err){
-      ErrorCodeHandler.getErrorJSONData({'code':2, 'res':res});
+      ErrorCodeHandler.getErrorJSONData({'code':2, 'res':res, 'dbErr' : err});
       return;
     }
     else if(doc){
@@ -112,7 +112,7 @@ exports.signup = function (req, res, next) {
       var user = new User(userObj);
       user.save(function(err, reply){
         if(err || !reply){
-          ErrorCodeHandler.getErrorJSONData({'code':2, 'res':res});
+          ErrorCodeHandler.getErrorJSONData({'code':2, 'res':res, 'dbErr' : err});
           return;
         }
         else{
@@ -150,7 +150,7 @@ exports.signin = function (req, res, next) {
 
   User.collection.findOne({username : username, password : password}, {password : 0}, function(err, user){
     if(err){
-      ErrorCodeHandler.getErrorJSONData({'code':2, 'res':res});
+      ErrorCodeHandler.getErrorJSONData({'code':2, 'res':res, 'dbErr' : err});
       return;
     }
     else if(!user){

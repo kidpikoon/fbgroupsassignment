@@ -51,12 +51,12 @@ exports.addDoc = function (req, res) {
 
   docsCollection.insert(docObj, function(err, reply){
     if(err || !reply || reply.result.ok < 1){
-      ErrorCodeHandler.getErrorJSONData({'code':2, 'res':res});
+      ErrorCodeHandler.getErrorJSONData({'code':2, 'res':res, 'dbErr' : err});
       return;
     }
     else{
       succResp.data = {
-        docId : reply.ops[0]._id
+        docId : reply._id
       };
       res.status(200).send(succResp);
     }
@@ -109,7 +109,7 @@ exports.getDocs = function (req, res) {
 
 	Events.collection.find(findQuery).limit(limit).sort({updated : -1}).toArray(function(err, docs){
 		if(err){
-      ErrorCodeHandler.getErrorJSONData({'code':2, 'res':res});
+      ErrorCodeHandler.getErrorJSONData({'code':2, 'res':res, 'dbErr' : err});
       return;
     }
     else{

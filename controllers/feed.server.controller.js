@@ -51,7 +51,7 @@ exports.addFeed = function (req, res) {
 
   feed.save(function(err, reply){
     if(err || !reply){
-      ErrorCodeHandler.getErrorJSONData({'code':2, 'res':res});
+      ErrorCodeHandler.getErrorJSONData({'code':2, 'res':res, 'dbErr' : err});
       return;
     }
     else{
@@ -109,9 +109,9 @@ exports.getFeeds = function (req, res) {
     }
   };
 
-	Feeds.collection.find(findQuery).limit(limit).sort({created : -1}).toArray(function(err, docs){
+	Feed.collection.find(findQuery).limit(limit).sort({created : -1}).toArray(function(err, docs){
 		if(err){
-      ErrorCodeHandler.getErrorJSONData({'code':2, 'res':res});
+      ErrorCodeHandler.getErrorJSONData({'code':2, 'res':res, 'dbErr' : err});
       return;
     }
     else{

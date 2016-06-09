@@ -29,22 +29,6 @@ var UserSchema = new Schema({
         trim: true,
         required: 'Password cannot be blank'
     },
-    description: {
-        type: String,
-        trim: true,
-        required: 'Description cannot be blank'
-    },
-    privacy: {
-        type: String,
-        trim: true,
-        enum : ['private', 'public'],
-        required: 'Name cannot be blank'
-    },
-    links : [{
-        type: String,
-        trim: true,
-        match: [/^http(?:s?):\/\/.*\..*/, 'Please fill valid URLs']
-    }],
     admin : [{
         type: Schema.ObjectId,
         ref: 'Group'

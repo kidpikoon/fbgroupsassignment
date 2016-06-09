@@ -48,6 +48,25 @@ var ErrorCodeHandler = {
 
     // Get Error Description
     var error_text = ERROR_CODES[code];
+
+    if(data_param.text && data_param.text.length > 0){
+      error_text = data_param.text;
+    }
+
+    if(data_param.dbErr){
+      if(data_param.dbErr.errors){
+        var errors = data_param.dbErr.errors;
+        for(var i in errors){
+          if(errors[i].message){
+            error_text = errors[i].message;
+            break;
+          }
+        }
+      }
+      else if(data_param.dbErr.code == 11000){
+        error_text = 'Value already exists (Duplicate key detected)';
+      }
+    }
     
     errResp =   {
             "data": data, 
@@ -56,7 +75,7 @@ var ErrorCodeHandler = {
               "text": error_text
             }
           };
-    res.send(errResp);
+    res.status(400).send(errResp);
     return;
   },
 

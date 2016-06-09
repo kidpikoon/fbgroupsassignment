@@ -25,11 +25,6 @@ exports.addGroup = function (req, res) {
     return;
   }
 
-  if(!CommonFunctions.isMongoId(userId)){
-    ErrorCodeHandler.getErrorJSONData({'code':13, 'res':res});
-    return;
-  }
-
   var succResp = {
     data : "",
     error : {
@@ -46,11 +41,11 @@ exports.addGroup = function (req, res) {
   var group = new Group(groupObj);
   group.save(function(err, reply){
     if(err || !reply){
-      ErrorCodeHandler.getErrorJSONData({'code':2, 'res':res});
+      ErrorCodeHandler.getErrorJSONData({'code':2, 'res':res, 'dbErr' : err});
       return;
     }
     else{
-      var groupId = reply.ops[0]._id;
+      var groupId = reply._id;
       var updateQuery = {
         $push : {
           admin : ObjectId(groupId)
@@ -58,7 +53,7 @@ exports.addGroup = function (req, res) {
       };
       User.collection.update({_id : ObjectId(userId)}, updateQuery, function(err, reply){
         if(err || reply.result.nModified < 1){
-          ErrorCodeHandler.getErrorJSONData({'code':2, 'res':res});
+          ErrorCodeHandler.getErrorJSONData({'code':2, 'res':res, 'dbErr' : err});
           return;
         }
         else{
@@ -91,7 +86,7 @@ exports.getGroup = function (req, res, next) {
 
 	Group.findById(groupId).exec(function(err, doc){
 		if(err){
-      ErrorCodeHandler.getErrorJSONData({'code':2, 'res':res});
+      ErrorCodeHandler.getErrorJSONData({'code':2, 'res':res, 'dbErr' : err});
       return;
     }
     else if(!doc){
@@ -177,7 +172,7 @@ exports.addAdmin = function (req, res) {
 
   User.findOne({_id : ObjectId(userId)}).exec(function(err, doc){
     if(err){
-      ErrorCodeHandler.getErrorJSONData({'code':2, 'res':res});
+      ErrorCodeHandler.getErrorJSONData({'code':2, 'res':res, 'dbErr' : err});
       return;
     }
     else if(!doc){
@@ -209,7 +204,7 @@ exports.addAdmin = function (req, res) {
 
       User.collection.update({_id : ObjectId(userId) }, updateQuery, function(err, reply){
         if(err || reply.result.nModified < 1){
-          ErrorCodeHandler.getErrorJSONData({'code':2, 'res':res});
+          ErrorCodeHandler.getErrorJSONData({'code':2, 'res':res, 'dbErr' : err});
           return;
         }
         else{
