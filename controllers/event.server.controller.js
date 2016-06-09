@@ -4,66 +4,41 @@
 
 'use strict';
 
-exports.addDoc = function (req, res) {
+exports.addEvent = function (req, res) {
   res.set({
           'Content-Type'  :   'application/json'
       });
   var data = req.body;
 
   // Compulsory
-  var userId = req.user._id;
-  var groupId = req.group._id;
-  var subject = (typeof(data.subject) !== "undefined")
-    ? data.subject.trim()
-    : "";
-  var message = (typeof(data.message) !== "undefined")
-    ? data.message.trim()
-    : "";
-  var icon = (typeof(data.icon) !== "undefined")
-    ? data.icon.trim().toLowerCase()
-    : "";
-
-  if( 
-      CommonFunctions.isNull(subject)   ||
-      CommonFunctions.isNull(message)   ||
-      CommonFunctions.isNull(icon)
-    ){
-    ErrorCodeHandler.getErrorJSONData({'code':1, 'res':res});
-    return;
-  }
+  data.userId = req.user._id;
+  data.groupId = req.group._id;
 
   var succResp = {
     data : "",
     error : {
       code: 0,
-      text : "Doc added successfully"
+      text : "Event added successfully"
     }
   };
 
-  var docObj = {
-    userId : ObjectId(userId),
-    groupId : ObjectId(groupId),
-    subject : subject,
-    icon : icon,
-    created : new Date(),
-    updated : new Date()
-  };
+  var event = new Event(data);
 
-  docsCollection.insert(docObj, function(err, reply){
-    if(err || !reply || reply.result.ok < 1){
+  event.save(function(err, reply){
+    if(err || !reply){
       ErrorCodeHandler.getErrorJSONData({'code':2, 'res':res, 'dbErr' : err});
       return;
     }
     else{
       succResp.data = {
-        docId : reply._id
+        eventId : reply._id
       };
       res.status(200).send(succResp);
     }
   });
 };
 
-exports.getDocs = function (req, res) {
+exports.getEvents = function (req, res) {
   res.set({
           'Content-Type'  :   'application/json'
       });
@@ -107,15 +82,15 @@ exports.getDocs = function (req, res) {
     }
   };
 
-	Events.collection.find(findQuery).limit(limit).sort({updated : -1}).toArray(function(err, docs){
+	Event.collection.find(findQuery).limit(limit).sort({updated : -1}).toArray(function(err, events){
 		if(err){
       ErrorCodeHandler.getErrorJSONData({'code':2, 'res':res, 'dbErr' : err});
       return;
     }
     else{
       succResp.data = {
-        docs : docs,
-        docsCount : docs.length
+        events : events,
+        eventsCount : events.length
       };
       res.status(200).send(succResp);
     }

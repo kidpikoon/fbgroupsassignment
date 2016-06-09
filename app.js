@@ -220,6 +220,7 @@ else {
   require('./routes/group.server.routes')(app);
   require('./routes/album.server.routes')(app);
   require('./routes/doc.server.routes')(app);
+  require('./routes/event.server.routes')(app);
 
   //
   // For webiste

@@ -22,28 +22,44 @@ var EventSchema = new Schema({
         type: Date,
         default: Date.now
     },
+    endDate: {
+        type: Date,
+        required: 'End Date cannot be blank'
+    },
     updated: {
         type: Date,
         default: Date.now
     },
-    message: {
+    name: {
         type: String,
         default: '',
         trim: true,
-        required: 'Message cannot be blank'
+        required: 'Name cannot be blank'
     },
-    subject: {
+    description: {
         type: String,
         default: '',
         trim: true,
-        required: 'Subject cannot be blank'
+        required: 'Description cannot be blank'
     },
-    icon : {
+    coverPhoto : {
         type: String,
         trim: true,
-        required: 'Icon cannot be blank',
+        required: 'Cover Photo cannot be blank',
         match: [/^http(?:s?):\/\/.*\..*/, 'Please fill a valid icon URL']
-    }
+    },
+    interestedCount: {
+        type: Number,
+        default: 0
+    },
+    declineCount: {
+        type: Number,
+        default: 0
+    },
+    maybeCount: {
+        type: Number,
+        default: 0
+    },
 });
 
 mongoose.model('Event', EventSchema);
