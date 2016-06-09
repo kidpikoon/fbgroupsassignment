@@ -121,38 +121,75 @@ else {
    */
   var MongoClient         =   require('mongodb').MongoClient;
   global.ObjectId         =   require('mongodb').ObjectID;
-  global.mongoConnection       = null;
-  global.userCollection        = null;
-  global.feedCollection        = null; 
-  global.eventCollection       = null; 
-  global.albumCollection       = null; 
-  global.docsCollection        = null; 
-  global.groupCollection       = null; 
+  // global.mongoConnection       = null;
+  global.User        = null;
+  global.Feed        = null; 
+  global.Event       = null; 
+  global.Album       = null; 
+  global.Docs        = null; 
+  global.Group       = null; 
 
-  MongoClient.connect(MONGO_URL, function(err, db) {  
-    // on error
-    if(err) {
-      console.log("Mongo Connection Error - ", err);
-      throw err;
+  var mongooseConn = require('mongoose');
+  var mongoose;
+
+  var connect = function(db) {
+    var safe = { j: 1, w: "majority", wtimeout: 7000 }; // 7000 for 7 secs
+    mongoose = mongooseConn.createConnection( db, { auto_reconnect: true , safe : safe});
+  };
+
+  // Bootstrap db connection
+  var isConnectedBefore = false;
+  
+  connect(db);
+  mongoose.on('disconnected', function() {
+    console.log('MongoDB disconnected!');
+    if(!isConnectedBefore){
+      connect(db);
     }
-
-    //console.log(db.serverConfig.connections().length);
-    //console.log(db.serverConfig);
-    
-    // save mongo connection
-    mongoConnection       =   db;
-    
-    // set collection
-    userCollection         = mongoConnection.collection(MONGO_COLL_USERS);
-    feedCollection         = mongoConnection.collection(MONGO_COLL_FEEDS);
-    eventCollection        = mongoConnection.collection(MONGO_COLL_EVENTS);
-    albumCollection        = mongoConnection.collection(MONGO_COLL_ALBUMS);
-    docsCollection         = mongoConnection.collection(MONGO_COLL_DOCS);
-    groupCollection        = mongoConnection.collection(MONGO_COLL_GROUPS);
-
-    // mongo db started
-    console.log('Mongo DB Started');
   });
+
+  mongoose.on('connected', function() {
+      isConnectedBefore = true;
+      console.log('Connection established to MongoDB');
+  });
+
+  mongoose.on('reconnected', function () {
+    console.log('MongoDB reconnected!');
+  });
+
+  mongoose.once('open', function(){
+    User        = mongoose.model('User');
+    Feed        = mongoose.model('Feed');
+    Event       = mongoose.model('Event');
+    Album       = mongoose.model('Album');
+    Docs        = mongoose.model('Docs');
+    Group       = mongoose.model('Group');
+  });
+
+  // MongoClient.connect(MONGO_URL, function(err, db) {  
+  //   // on error
+  //   if(err) {
+  //     console.log("Mongo Connection Error - ", err);
+  //     throw err;
+  //   }
+
+  //   //console.log(db.serverConfig.connections().length);
+  //   //console.log(db.serverConfig);
+    
+  //   // save mongo connection
+  //   mongoConnection       =   db;
+    
+  //   // set collection
+  //   userCollection         = mongoConnection.collection(MONGO_COLL_USERS);
+  //   feedCollection         = mongoConnection.collection(MONGO_COLL_FEEDS);
+  //   eventCollection        = mongoConnection.collection(MONGO_COLL_EVENTS);
+  //   albumCollection        = mongoConnection.collection(MONGO_COLL_ALBUMS);
+  //   docsCollection         = mongoConnection.collection(MONGO_COLL_DOCS);
+  //   groupCollection        = mongoConnection.collection(MONGO_COLL_GROUPS);
+
+  //   // mongo db started
+  //   console.log('Mongo DB Started');
+  // });
 
   /**
    * Other Required Module
