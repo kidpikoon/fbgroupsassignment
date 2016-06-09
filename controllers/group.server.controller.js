@@ -38,46 +38,34 @@ exports.addGroup = function (req, res) {
     }
   };
 
-  userCollection.findOne({userId : ObjectId(userId)}, function(err, doc){
-    if(err){
+  var groupObj = {
+    userId : ObjectId(userId),
+    name : name,
+    created : new Date()
+  };
+  var group = new Group(groupObj);
+  group.save(function(err, reply){
+    if(err || !reply){
       ErrorCodeHandler.getErrorJSONData({'code':2, 'res':res});
       return;
     }
-    else if(doc){
-      ErrorCodeHandler.getErrorJSONData({'code':13, 'res':res});
-      return;
-    }
     else{
-      var groupObj = {
-        userId : ObjectId(userId),
-        name : name,
-        created : new Date()
+      var groupId = reply.ops[0]._id;
+      var updateQuery = {
+        $push : {
+          admin : ObjectId(groupId)
+        }
       };
-
-      groupCollection.insert(groupObj, function(err, reply){
-        if(err || !reply || reply.result.ok < 1){
+      User.collection.update({_id : ObjectId(userId)}, updateQuery, function(err, reply){
+        if(err || reply.result.nModified < 1){
           ErrorCodeHandler.getErrorJSONData({'code':2, 'res':res});
           return;
         }
         else{
-          var groupId = reply.ops[0]._id;
-          var updateQuery = {
-            $push : {
-              admin : ObjectId(groupId)
-            }
+          succResp.data = {
+            groupId : groupId
           };
-          userCollection.update({_id : ObjectId(userId)}, updateQuery, function(err, reply){
-            if(err || reply.result.nModified < 1){
-              ErrorCodeHandler.getErrorJSONData({'code':2, 'res':res});
-              return;
-            }
-            else{
-              succResp.data = {
-                groupId : groupId
-              };
-              res.status(200).send(succResp);
-            }
-          });
+          res.status(200).send(succResp);
         }
       });
     }
@@ -101,11 +89,7 @@ exports.getGroup = function (req, res, next) {
     return;
   }
 
-	var findQuery = {
-		_id : ObjectId(groupId)
-	};
-
-	groupCollection.findOne(findQuery, function(err, doc){
+	Group.findById(groupId).exec(function(err, doc){
 		if(err){
       ErrorCodeHandler.getErrorJSONData({'code':2, 'res':res});
       return;
@@ -191,7 +175,7 @@ exports.addAdmin = function (req, res) {
     }
   };
 
-  userCollection.findOne({_id : ObjectId(userId)}, function(err, doc){
+  User.findOne({_id : ObjectId(userId)}).exec(function(err, doc){
     if(err){
       ErrorCodeHandler.getErrorJSONData({'code':2, 'res':res});
       return;
@@ -223,7 +207,7 @@ exports.addAdmin = function (req, res) {
         return;
       }
 
-      userCollection.update({_id : ObjectId(userId) }, updateQuery, function(err, reply){
+      User.collection.update({_id : ObjectId(userId) }, updateQuery, function(err, reply){
         if(err || reply.result.nModified < 1){
           ErrorCodeHandler.getErrorJSONData({'code':2, 'res':res});
           return;

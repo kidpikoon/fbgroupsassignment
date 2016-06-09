@@ -70,14 +70,15 @@ exports.addAlbum = function (req, res) {
     created : new Date()
   };
 
-  albumCollection.insert(albumObj, function(err, reply){
-    if(err || !reply || reply.result.ok < 1){
+  var album = new Album(albumObj);
+  album.save(function(err, reply){
+    if(err || !reply){
       ErrorCodeHandler.getErrorJSONData({'code':2, 'res':res});
       return;
     }
     else{
       succResp.data = {
-        albumId : reply.ops[0]._id
+        albumId : reply._id
       };
       res.status(200).send(succResp);
     }
@@ -132,7 +133,7 @@ exports.getAlbums = function (req, res) {
     }
   };
 
-	albumCollection.find(findQuery).limit(limit).sort({created : -1}).toArray(function(err, docs){
+	Album.collection.find(findQuery).limit(limit).sort({created : -1}).toArray(function(err, docs){
 		if(err){
       ErrorCodeHandler.getErrorJSONData({'code':2, 'res':res});
       return;

@@ -45,7 +45,7 @@ exports.logIn = function (req, res, next) {
       }
       else{
         user = JSON.parse(user);
-        userCollection.findOne({_id : ObjectId(user._id)}, function(err, doc){
+        User.findById(user._id).exec(function(err, doc){
           req.user = doc;
           next();
         });
@@ -71,9 +71,6 @@ exports.signup = function (req, res, next) {
   var verifyPassword = (typeof(data.verifyPassword) !== "undefined")
     ? data.verifyPassword.trim()
     : "";
-  var admin = (typeof(data.admin) !== "undefined")
-    ? data.admin.trim()
-    : false;
 
   if( 
       CommonFunctions.isNull(username)  ||
@@ -97,7 +94,7 @@ exports.signup = function (req, res, next) {
     }
   };
 
-  userCollection.findOne({username : username}, function(err, doc){
+  User.findOne({username : username}).exec(function(err, doc){
     if(err){
       ErrorCodeHandler.getErrorJSONData({'code':2, 'res':res});
       return;
@@ -112,17 +109,15 @@ exports.signup = function (req, res, next) {
         password : password,
         created : new Date()
       };
-      if(admin == true || admin == 'true'){
-        userObj.admin = true;
-      }
-      userCollection.insert(userObj, function(err, reply){
-        if(err || !reply || reply.result.ok < 1){
+      var user = new User(userObj);
+      user.save(function(err, reply){
+        if(err || !reply){
           ErrorCodeHandler.getErrorJSONData({'code':2, 'res':res});
           return;
         }
         else{
           succResp.data = {
-            userId : reply.ops[0]._id
+            userId : reply._id
           };
           res.status(200).send(succResp);
         }
@@ -153,7 +148,7 @@ exports.signin = function (req, res, next) {
     return;
   }
 
-  userCollection.findOne({username : username, password : password}, {password : 0}, function(err, user){
+  User.collection.findOne({username : username, password : password}, {password : 0}, function(err, user){
     if(err){
       ErrorCodeHandler.getErrorJSONData({'code':2, 'res':res});
       return;

@@ -107,7 +107,7 @@ exports.getDocs = function (req, res) {
     }
   };
 
-	docsCollection.find(findQuery).limit(limit).sort({updated : -1}).toArray(function(err, docs){
+	Events.collection.find(findQuery).limit(limit).sort({updated : -1}).toArray(function(err, docs){
 		if(err){
       ErrorCodeHandler.getErrorJSONData({'code':2, 'res':res});
       return;

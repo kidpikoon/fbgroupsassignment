@@ -47,15 +47,16 @@ exports.addFeed = function (req, res) {
     link : link,
     created : new Date()
   };
+  var feed = new Feed(feedObj);
 
-  feedCollection.insert(feedObj, function(err, reply){
-    if(err || !reply || reply.result.ok < 1){
+  feed.save(function(err, reply){
+    if(err || !reply){
       ErrorCodeHandler.getErrorJSONData({'code':2, 'res':res});
       return;
     }
     else{
       succResp.data = {
-        feedId : reply.ops[0]._id
+        feedId : reply._id
       };
       res.status(200).send(succResp);
     }
@@ -108,7 +109,7 @@ exports.getFeeds = function (req, res) {
     }
   };
 
-	feedCollection.find(findQuery).limit(limit).sort({created : -1}).toArray(function(err, docs){
+	Feeds.collection.find(findQuery).limit(limit).sort({created : -1}).toArray(function(err, docs){
 		if(err){
       ErrorCodeHandler.getErrorJSONData({'code':2, 'res':res});
       return;
